@@ -31,7 +31,7 @@ namespace PageNotFoundManager
                 // a domain is set, so I think we need to prefix the request to GetByRoute by the id of the node it is attached to.
                 // I guess if the Uri contains one of these, lets use it's RootContentid as a prefix for the subsequent calls to GetByRoute...
                 var domain = domains.FirstOrDefault(d => (contentRequest.Uri.Authority.ToLower() + contentRequest.Uri.AbsolutePath.ToLower())
-                                .StartsWith(d.DomainEntity.DomainName.ToLower()));
+                                .StartsWith(d.Name.ToLower()));
                 if (domain != null)
                 {
                     // the domain has a RootContentId or RootNodeId in old domain model that we can use as the prefix.

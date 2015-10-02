@@ -19,19 +19,22 @@ namespace PageNotFoundManager
       // a route is "/path/to/page" when there is no domain, and "123/path/to/page" when there is a domain, and then 123 is the ID of the node which is the root of the domain
            //get domain name from Uri
             // find umbraco home node for uri's domain, and get the id of the node it is set on
-            var ds = ApplicationContext.Current.Services.DomainService;
-            var domains = ds.GetAll(true) as IList<IDomain> ?? ds.GetAll(true).ToList();
+                // DomainService is only 7.3
+            //    var ds = ApplicationContext.Current.Services.DomainService;
+          //  var domains = ds.GetAll(true) as IList<IDomain> ?? ds.GetAll(true).ToList();
+            // this is legacy approach
+            var domains = Domain.GetDomains().ToList();
             var domainRoutePrefixId = String.Empty;
             if (domains.Any())
             {
                 // a domain is set, so I think we need to prefix the request to GetByRoute by the id of the node it is attached to.
                 // I guess if the Uri contains one of these, lets use it's RootContentid as a prefix for the subsequent calls to GetByRoute...
                 var domain = domains.FirstOrDefault(d => (contentRequest.Uri.Authority.ToLower() + contentRequest.Uri.AbsolutePath.ToLower())
-                                .StartsWith(d.DomainName.ToLower()));
+                                .StartsWith(d.DomainEntity.DomainName.ToLower()));
                 if (domain != null)
                 {
-                    // the domain has a RootContentId that we can use as the prefix.
-                    domainRoutePrefixId = domain.RootContentId.ToString();
+                    // the domain has a RootContentId or RootNodeId in old domain model that we can use as the prefix.
+                    domainRoutePrefixId = domain.RootNodeId.ToString();
                 }
             }
             var closestContent = UmbracoContext.Current.ContentCache.GetByRoute(domainRoutePrefixId + uri.ToString(),false);
